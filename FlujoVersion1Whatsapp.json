@@ -1,0 +1,1484 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "all"
+          ]
+        }
+      },
+      "id": "8ef31ccf-0d71-4bad-a411-b9f1150472e5",
+      "name": "WhatsApp Trigger2",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        928
+      ],
+      "webhookId": "76222d49-2eaf-488a-9362-c7ece2a5ef58",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "fP7JBEoKZhqM4mMJ",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1024372897426004",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.messages?.[0]?.from || $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id }}",
+        "textBody": "Lo siento, no tienes permisos para usar este bot. Contacta al administrador.",
+        "additionalFields": {}
+      },
+      "id": "7ec2b52f-0335-4a07-b669-f910e5ce85bc",
+      "name": "Usuario Bloqueado",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        1024
+      ],
+      "webhookId": "3b7d835b-0dd5-4190-a566-727f1f32b189",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.estatus }}",
+              "rightValue": "Activo",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "89641521-77dc-4e3f-9c77-1d3831cee4b8"
+            },
+            {
+              "id": "e21cd45c-e4a1-4366-a677-c08a2c7edb0a",
+              "leftValue": "={{ $json.estatus }}",
+              "rightValue": "Inactivo",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "d6b682f4-e4dc-48e1-8a60-5bcc209ca967",
+      "name": "Usuario Activo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        928
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1024372897426004",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}",
+        "textBody": "Escribe tu pregunta y con gusto te ayudaremos.",
+        "additionalFields": {}
+      },
+      "id": "c847ffeb-8cdf-4d99-b015-ba48f9c6fef2",
+      "name": "Respuesta Preguntas",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        1344
+      ],
+      "webhookId": "12b7c267-b66b-490e-a60e-43b397ef2a6b",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/1024372897426004/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger2').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"body\": {\n      \"text\": \"Bienvenido a Unitas. Selecciona una opción:\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"cobrar_comisiones\",\n            \"title\": \"Cobrar Comisiones\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"hacer_pregunta\",\n            \"title\": \"Hacer una Pregunta\"\n          }\n        }\n      ]\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "1951ecd3-acff-4c0e-b7dc-44588657f94b",
+      "name": "Enviar Menu",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        16,
+        352
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "PeNUxfYDHgOkEAZ4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "10640059-1d0a-420e-9289-bbd85673c39b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0439c449-8866-43ef-a3fc-bc4e1d0ad9de",
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0].type }}",
+                    "rightValue": "interactive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1104,
+        832
+      ],
+      "id": "3a1123d7-27b9-4498-8fde-a06bb02a1885",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0]?.interactive?.button_reply?.id }}",
+                    "rightValue": "cobrar_comisiones",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9fd1568d-065e-4749-bc4c-120b540f474b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0b530341-0bc7-474b-9a52-772e29f8916c",
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0]?.interactive?.button_reply?.id }}",
+                    "rightValue": "hacer_pregunta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        1472
+      ],
+      "id": "519b9f1a-40ce-4569-a74b-68b4cee6737e",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger2').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}",
+        "textBody": "Por favor, ingresa la Clave de la promotoría:",
+        "additionalFields": {}
+      },
+      "id": "cb93d435-38e0-4158-9021-de5df3b1310c",
+      "name": "Solicitar Clave",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        1120
+      ],
+      "webhookId": "12b7c267-b66b-490e-a60e-43b397ef2a6b",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Get a row1\"].json.paso_actual }}",
+              "rightValue": "ESPERANDO_CLAVE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "condition1"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7880cf74-38b3-463c-9528-c66a0297baac",
+      "name": "Es Paso Clave?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1024372897426004",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}",
+        "textBody": "Gracias. Ahora ingresa el *Número de póliza*:",
+        "additionalFields": {}
+      },
+      "id": "07a702e2-183f-4fbb-b7a8-33db853a8b91",
+      "name": "Solicitar Poliza",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        928
+      ],
+      "webhookId": "d1490e4f-8f9c-46e2-8185-2c1831dfd145",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Get a row1\"].json.paso_actual }}",
+              "rightValue": "ESPERANDO_POLIZA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "condition2"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "35aac4ea-e50d-40b3-a125-d2da77ade7e9",
+      "name": "Es Paso Poliza?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/1024372897426004/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger2').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"list\",\n    \"body\": {\n      \"text\": \"Selecciona la compañía aseguradora:\"\n    },\n    \"action\": {\n      \"button\": \"Ver Aseguradoras\",\n      \"sections\": [\n        {\n          \"title\": \"ASEGURADORAS DISPONIBLES\",\n          \"rows\": [\n            {\"id\": \"AFIRME\", \"title\": \"AFIRME\"},\n            {\"id\": \"AXA\", \"title\": \"AXA\"},\n            {\"id\": \"ALLIANZ\", \"title\": \"ALLIANZ\"},\n            {\"id\": \"LA_LATINO\", \"title\": \"LA LATINO\"},\n            {\"id\": \"MAPFRE\", \"title\": \"MAPFRE\"},\n            {\"id\": \"CHUBB\", \"title\": \"CHUBB\"},\n            {\"id\": \"ATLAS\", \"title\": \"ATLAS\"},\n            {\"id\": \"QUALITAS\", \"title\": \"QUALITAS\"},\n            {\"id\": \"METLIFE\", \"title\": \"METLIFE\"},\n            {\"id\": \"OTRA\", \"title\": \"OTRA (ESCRIBE MANUAL)\"}\n          ]\n        }\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "ddcb898a-ddcd-422c-9186-f6f44123ef8d",
+      "name": "Enviar Menu Companias",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -208,
+        736
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "PeNUxfYDHgOkEAZ4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Get a row1\"].json.paso_actual }}",
+              "rightValue": "ESPERANDO_COMPANIA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "condition3"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "66931556-d033-4cf3-a61a-65a6c34363f3",
+      "name": "Es Paso Compania?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Detectar si es interactivo (list_reply) o texto\nconst message = $('WhatsApp Trigger2').item.json.messages?.[0];\nlet companiaTexto = '';\n\nif (!message) {\n  return { companiaTexto: ''};\n}\n\nif (message.type === 'interactive' && message.interactive?.list_reply?.id) {\n  companiaTexto = message.interactive.list_reply.id;\n} else if (message.type === 'text' && message.text?.body) {\n  companiaTexto = message.text.body;\n}\n\nreturn { companiaTexto };"
+      },
+      "id": "ec60a6ac-8509-4d9d-b376-a419648031a9",
+      "name": "Extraer Compania",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger2').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}",
+        "textBody": "Último dato. ¿Cuál es el *Nombre del cliente*?",
+        "additionalFields": {}
+      },
+      "id": "ab199142-099d-41f3-8bd4-5e3902b986d7",
+      "name": "Solicitar Contratista",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        544
+      ],
+      "webhookId": "4d6e3aea-e980-4ad6-87ba-aa4d0cdc4181",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Get a row1\"].json.paso_actual }}",
+              "rightValue": "ESPERANDO_CONTRATISTA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "condition4"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f2c583dc-eb20-40e6-a429-85a8ab81b53c",
+      "name": "Es Paso Contratista?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kHaurajcJ291NEctVmgKoZ-m0JFkWcDpASVzNi900T4",
+          "mode": "list",
+          "cachedResultName": "AseguradorasWhatsapp",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kHaurajcJ291NEctVmgKoZ-m0JFkWcDpASVzNi900T4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 34173836,
+          "mode": "list",
+          "cachedResultName": "CobroComisiones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kHaurajcJ291NEctVmgKoZ-m0JFkWcDpASVzNi900T4/edit#gid=34173836"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre de contratista": "={{ $json['Nombre de contratista'] }}",
+            "Aseguradora": "={{ $json.Aseguradora }}",
+            "numero de poliza": "={{ $json['numero de poliza'] }}",
+            "Clave de promotora": "={{ $json['Clave de promotora'] }}",
+            "Telefono ": "={{ $json.Telefono }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Telefono ",
+              "displayName": "Telefono ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clave de promotora",
+              "displayName": "Clave de promotora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numero de poliza",
+              "displayName": "numero de poliza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Aseguradora",
+              "displayName": "Aseguradora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre de contratista",
+              "displayName": "Nombre de contratista",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2afbdf20-775a-406e-b6a8-8b50a64e1a3f",
+      "name": "Guardar Comision Final",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CHkmIvYygpyK5x5L",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calcular mensaje según la hora\nconst currentHour = new Date().getHours();\nlet timeMessage = '';\n\nif (currentHour >= 12) {\n  timeMessage = 'Gracias tu comision sera pagada el dia de mañana';\n} else {\n  timeMessage = 'Gracias tu comision sera pagada el dia hoy';\n}\n\nreturn { timeMessage };"
+      },
+      "id": "2f5fba2a-466e-499e-a84e-ea3aaca57a62",
+      "name": "Calcular Mensaje Horario",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger2').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger2').item.json.contacts[0].wa_id }}",
+        "textBody": "=✅ Información guardada correctamente.\n{{ $('Calcular Mensaje Horario').item.json.timeMessage }}\n\n¿Deseas realizar otra operación?",
+        "additionalFields": {}
+      },
+      "id": "ff08cc11-a04d-404b-89e3-100be0559a5d",
+      "name": "Enviar Confirmacion",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        688,
+        160
+      ],
+      "webhookId": "8ed98cc4-e29d-4ff4-8ed5-e56fc7d17cdb",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "DDVRDoix49FJnK36",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/1024372897426004/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger2').item.json.contacts[0].wa_id }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"body\": {\n      \"text\": \"Selecciona una opción:\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"cobrar_comisiones\",\n            \"title\": \"Cobrar Comisiones\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"hacer_pregunta\",\n            \"title\": \"Hacer una Pregunta\"\n          }\n        }\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "934477ed-c289-48af-badd-6feb00d6e36d",
+      "name": "Menu Final",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1136,
+        160
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "PeNUxfYDHgOkEAZ4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/1024372897426004/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"recipient_type\": \"individual\",\n  \"to\": \"{{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}\",\n  \"type\": \"interactive\",\n  \"interactive\": {\n    \"type\": \"button\",\n    \"body\": {\n      \"text\": \"¿Qué tipo de comisión deseas cobrar?\"\n    },\n    \"action\": {\n      \"buttons\": [\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"una_comision\",\n            \"title\": \"Una Comisión\"\n          }\n        },\n        {\n          \"type\": \"reply\",\n          \"reply\": {\n            \"id\": \"carga_masiva\",\n            \"title\": \"Carga Masiva\"\n          }\n        }\n      ]\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "8b4c1304-90e3-4101-ad45-50239d7749ee",
+      "name": "Enviar Menu Tipo Comision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -176,
+        1504
+      ],
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "PeNUxfYDHgOkEAZ4",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $node[\"Get a row1\"].json.paso_actual }}",
+              "rightValue": "MENU_TIPO_COMISION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "conditionMenu"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8e70b277-80fd-4015-9bfa-d32cc91ac46d",
+      "name": "Es Menu Tipo Comision?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        1312
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0]?.interactive?.button_reply?.id }}",
+                    "rightValue": "una_comision",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "switch-una"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "switch-masiva",
+                    "leftValue": "={{ $('WhatsApp Trigger2').item.json.messages[0]?.interactive?.button_reply?.id }}",
+                    "rightValue": "carga_masiva",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "907fbde0-d33a-4afa-b41f-7ecf78d9027a",
+      "name": "Switch Tipo Comision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tel",
+              "name": "Telefono",
+              "value": "={{ $('WhatsApp Trigger2').item.json.contacts?.[0]?.wa_id || $('WhatsApp Trigger2').item.json.messages?.[0]?.from }}",
+              "type": "string"
+            },
+            {
+              "id": "clave",
+              "name": "Clave de promotora",
+              "value": "={{ $('Get row(s) in sheet').item.json.Clave }}",
+              "type": "string"
+            },
+            {
+              "id": "poliza",
+              "name": "numero de poliza",
+              "value": "={{ $('Get row(s) in sheet').item.json.Poliza }}",
+              "type": "string"
+            },
+            {
+              "id": "aseg",
+              "name": "Aseguradora",
+              "value": "={{ $('Get row(s) in sheet').item.json.Compania }}",
+              "type": "string"
+            },
+            {
+              "id": "contrat",
+              "name": "Nombre de contratista",
+              "value": "={{ $('WhatsApp Trigger2').item.json.messages?.[0]?.text?.body || \"\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e8ddf095-c166-461e-87b3-f27fc2d376fe",
+      "name": "Preparar Datos Comision",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "agentes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "keyValue": "={{ $json.messages[0].from }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        928
+      ],
+      "id": "400022bc-566d-4d07-b295-b8a4e52b067a",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json[\"messages\"][0][\"from\"] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        816
+      ],
+      "id": "f7190426-78a5-4805-9e08-6ff56519027a",
+      "name": "Get a row1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json[\"messages\"][0][\"from\"] }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "ESPERANDO_POLIZA"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "={{ JSON.stringify({ ...$node[\"Get a row1\"].json.datos_temporales, \"clave\": $node[\"WhatsApp Trigger2\"].json.messages[0].text.body }) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        784
+      ],
+      "id": "cc1ee882-0d8a-4c23-8100-99dab3aa789a",
+      "name": "Guardar clave",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json.messages[0].from }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "MENU_TIPO_COMISION"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "{}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        1136
+      ],
+      "id": "069e96cf-a6f6-401b-a948-d4c698c8f5b5",
+      "name": "Iniciar Estado Comision1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json.messages[0].from }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "MENU_TIPO_COMISION"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "={{ {} }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        1536
+      ],
+      "id": "6254c4ee-65f7-444b-9261-4c092fefb240",
+      "name": "Iniciar Estado Comision",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json.messages[0].from }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "ESPERANDO_COMPANIA"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "={{ JSON.stringify({ ...$node[\"Get a row1\"].json.datos_temporales, \"poliza\": $node[\"WhatsApp Trigger2\"].json.messages[0].text.body }) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        624
+      ],
+      "id": "689d4b76-b664-4dcf-aa75-fc203ce0bc8a",
+      "name": "GuardarPoliza",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json.messages[0].from }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "ESPERANDO_CONTRATISTA"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "={{ JSON.stringify({ ...$node[\"Get a row1\"].json.datos_temporales, \"compania\": $node[\"Extraer Compania\"].json.companiaTexto }) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        544
+      ],
+      "id": "f4c0aa71-bc3e-488b-97cc-cc8939d8de64",
+      "name": "GuardarCompania",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "sesiones_n8n",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefono",
+              "condition": "eq",
+              "keyValue": "={{ $node[\"WhatsApp Trigger2\"].json.messages[0].from }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "paso_actual",
+              "fieldValue": "COMPLETADO"
+            },
+            {
+              "fieldId": "datos_temporales",
+              "fieldValue": "={}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        896,
+        160
+      ],
+      "id": "60085e15-6de9-4d8b-b51d-b98bad2428bc",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "62QCnnNeSXsnPjwd",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Usuario Activo?": {
+      "main": [
+        [
+          {
+            "node": "Get a row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Usuario Bloqueado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Es Paso Clave?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Es Menu Tipo Comision?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Iniciar Estado Comision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Preguntas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Paso Clave?": {
+      "main": [
+        [
+          {
+            "node": "Guardar clave",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Es Paso Poliza?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Paso Poliza?": {
+      "main": [
+        [
+          {
+            "node": "GuardarPoliza",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Es Paso Compania?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Paso Compania?": {
+      "main": [
+        [
+          {
+            "node": "Extraer Compania",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Es Paso Contratista?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Compania": {
+      "main": [
+        [
+          {
+            "node": "GuardarCompania",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Paso Contratista?": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos Comision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Comision Final": {
+      "main": [
+        [
+          {
+            "node": "Calcular Mensaje Horario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Mensaje Horario": {
+      "main": [
+        [
+          {
+            "node": "Enviar Confirmacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Confirmacion": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es Menu Tipo Comision?": {
+      "main": [
+        [
+          {
+            "node": "Switch Tipo Comision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Tipo Comision": {
+      "main": [
+        [
+          {
+            "node": "Iniciar Estado Comision1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Preguntas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos Comision": {
+      "main": [
+        [
+          {
+            "node": "Guardar Comision Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Usuario Activo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar clave": {
+      "main": [
+        [
+          {
+            "node": "Solicitar Poliza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar Estado Comision1": {
+      "main": [
+        [
+          {
+            "node": "Solicitar Clave",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iniciar Estado Comision": {
+      "main": [
+        [
+          {
+            "node": "Enviar Menu Tipo Comision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GuardarPoliza": {
+      "main": [
+        [
+          {
+            "node": "Enviar Menu Companias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GuardarCompania": {
+      "main": [
+        [
+          {
+            "node": "Solicitar Contratista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Menu Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e962be7157acd47c291d01937d6c6ebf583ce78c29abd7d0b0ac8f36564b8e4a"
+  }
+}
